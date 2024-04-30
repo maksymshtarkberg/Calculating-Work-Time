@@ -35,6 +35,6 @@ func (wm *WorkerManager) AddWorker(name, surname string) {
 
 func (wm *WorkerManager) PrintAllWorkers() {
 	for _, worker := range wm.workers {
-		fmt.Println("Name:%s, Surname:%s", worker.Name, worker.Surname)
+		fmt.Printf("Name:%s, Surname:%s", worker.Name, worker.Surname)
 	}
 }

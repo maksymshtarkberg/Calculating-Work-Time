@@ -6,4 +6,6 @@ func main() {
 	workerManager := app.NewWorkerManager()
 	workerManager.AddWorker("John", "Doe")
 
+	workerManager.PrintAllWorkers()
+
 }
