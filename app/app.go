@@ -1,5 +1,7 @@
 package app
 
+import "fmt"
+
 type Worker struct {
 	ID      int
 	Name    string
@@ -29,4 +31,10 @@ func (wm *WorkerManager) AddWorker(name, surname string) {
 		Surname: surname,
 	}
 	wm.workers[id] = worker
+}
+
+func (wm *WorkerManager) PrintAllWorkers() {
+	for _, worker := range wm.workers {
+		fmt.Println("Name:%s, Surname:%s", worker.Name, worker.Surname)
+	}
 }
