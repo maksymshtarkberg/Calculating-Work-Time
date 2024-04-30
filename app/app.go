@@ -21,7 +21,7 @@ func NewWorkerManager() *WorkerManager {
 	}
 }
 
-func (wm *WorkerManager) addWorker(name, surname string) {
+func (wm *WorkerManager) AddWorker(name, surname string) {
 	id := len(wm.workers) + 1
 	worker := Worker{
 		ID:      id,
