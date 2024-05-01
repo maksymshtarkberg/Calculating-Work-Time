@@ -178,12 +178,12 @@ func GetWorkerTime(wm *WorkerManager) {
 
 	for i, day := range workDays {
 		fmt.Printf("%sEnter to work: %.2f, Out of work: %.2f\n", daysOfWeek[i], day.EnterTime, day.OutTime)
+
 		if day.EnterTime > day.OutTime {
 			totalHours += 24 - day.EnterTime + day.OutTime
 		} else {
 			totalHours += day.OutTime - day.EnterTime
 		}
-
 	}
 
 	fmt.Printf("Total working hours for the week: %.2f\n", totalHours)
