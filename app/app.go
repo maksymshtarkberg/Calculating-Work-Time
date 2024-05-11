@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -106,7 +107,7 @@ func (wm *WorkerManager) SetWorkingHours(id, day int, enterTime, outTime float64
 
 func HandleSetWorkingHours(wm *WorkerManager) {
 	var id, day int
-	var enterTime, outTime float64
+	var enterTimeStr, outTimeStr string
 
 	fmt.Print("Enter id of the employee:")
 	fmt.Scanln(&id)
@@ -124,17 +125,53 @@ func HandleSetWorkingHours(wm *WorkerManager) {
 		return
 	}
 
-	fmt.Print("Enter the time the employee started work:")
-	fmt.Scanln(&enterTime)
-	fmt.Print("Enter the time the employee finished work:")
-	fmt.Scanln(&outTime)
+	fmt.Print("Enter the time the employee started work (hh:mm):")
+	fmt.Scanln(&enterTimeStr)
 
-	if enterTime < 0 || outTime < 0 {
-		fmt.Println("Negative time is not allowed")
+	fmt.Print("Enter the time the employee finished work (hh:mm):")
+	fmt.Scanln(&outTimeStr)
+
+	enterHour, enterMinute, err := parseTime(enterTimeStr)
+	if err != nil {
+		fmt.Println("Invalid time format:", err)
 		return
 	}
 
+	outHour, outMinute, err := parseTime(outTimeStr)
+	if err != nil {
+		fmt.Println("Invalid time format:", err)
+		return
+	}
+
+	enterTime := float64(enterHour) + float64(enterMinute)/60
+	outTime := float64(outHour) + float64(outMinute)/60
+
 	wm.SetWorkingHours(id, day, enterTime, outTime)
+}
+
+func parseTime(timeStr string) (hour, minute int, err error) {
+	parts := strings.Split(timeStr, ":")
+	if len(parts) != 2 {
+		err = fmt.Errorf("invalid time format")
+		return
+	}
+
+	hour, err = strconv.Atoi(parts[0])
+	if err != nil {
+		return
+	}
+
+	minute, err = strconv.Atoi(parts[1])
+	if err != nil {
+		return
+	}
+
+	if hour < 0 || hour >= 24 || minute < 0 || minute >= 60 {
+		err = fmt.Errorf("invalid time values")
+		return
+	}
+
+	return
 }
 
 func GetWorkers(wm *WorkerManager) {
@@ -177,16 +214,24 @@ func GetWorkerTime(wm *WorkerManager) {
 	daysOfWeek := []string{"Monday\n", "Tuesday\n", "Wednesday\n", "Thursday\n", "Friday\n", "Saturday\n", "Sunday\n"}
 
 	for i, day := range workDays {
-		fmt.Printf("%sEnter to work: %.2f, Out of work: %.2f\n", daysOfWeek[i], day.EnterTime, day.OutTime)
+		enterHour := int(day.EnterTime)
+		enterMinute := int((day.EnterTime - float64(enterHour)) * 60)
+		outHour := int(day.OutTime)
+		outMinute := int((day.OutTime - float64(outHour)) * 60)
+
+		fmt.Printf("%sEnter to work: %02d:%02d, Out of work: %02d:%02d\n", daysOfWeek[i], enterHour, enterMinute, outHour, outMinute)
 
 		if day.EnterTime > day.OutTime {
-			totalHours += 24 - day.EnterTime + day.OutTime
+			totalHours += float64(outHour) + float64(outMinute)/60 - (float64(enterHour) + float64(enterMinute)/60) + 24.0
 		} else {
 			totalHours += day.OutTime - day.EnterTime
 		}
 	}
 
-	fmt.Printf("Total working hours for the week: %.2f\n", totalHours)
+	totalHoursInt := int(totalHours)
+	totalMinutes := int((totalHours - float64(totalHoursInt)) * 60)
+
+	fmt.Printf("Total working hours for the week: %02d:%02d\n", totalHoursInt, totalMinutes)
 	fmt.Println()
 
 }
